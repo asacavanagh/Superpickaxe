@@ -23,30 +23,29 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 import de.diddiz.LogBlock.Consumer;
 import de.diddiz.LogBlock.LogBlock;
+import com.sk89q.wepif.PermissionsResolverManager; 
+
+// Dropped "Permissions" only support; now imports "WEPIF" to support
+// many major permissions plugins and even BukkitPermissions
 
 public class Superpickaxe extends JavaPlugin implements Listener
 {
-	private PermissionHandler permissions = null;
 	private final Set<String> playerswithsp = new HashSet<String>();
 	private Set<Integer> tools, dontBreak;
-	private boolean disableDrops, disableToolWear, overrideWorldEditCommands;
+	private boolean disableDrops, overrideWorldEditCommands;
 	private Consumer consumer;
 
 	@Override
 	public void onEnable() {
 		final PluginManager pm = getPluginManager();
-		if (pm.getPlugin("Permissions") != null)
-			permissions = ((Permissions)pm.getPlugin("Permissions")).getHandler();
+		PermissionsResolverManager.initialize(this);
 		final Map<String, Object> def = new HashMap<String, Object>();
-		def.put("overrideWorldEditCommands", false);
-		def.put("tools", Arrays.asList(270, 274, 278, 285));
+		def.put("overrideWorldEditCommands", true);
+		def.put("tools", Arrays.asList(257, 270, 274, 278, 285)); // Iron, Wood, Stone, Gold & Diamond Picks
 		def.put("dontBreak", Arrays.asList(7));
 		def.put("disableDrops", false);
-		def.put("disableToolWear", false);
 		final FileConfiguration config = getConfig();
 		for (final Entry<String, Object> e : def.entrySet())
 			if (!config.contains(e.getKey()))
@@ -56,45 +55,44 @@ public class Superpickaxe extends JavaPlugin implements Listener
 		tools = new HashSet<Integer>(cfg.getIntegerList("tools"));
 		dontBreak = new HashSet<Integer>(cfg.getIntegerList("dontBreak"));
 		disableDrops = cfg.getBoolean("disableDrops", false);
-		disableToolWear = cfg.getBoolean("disableToolWear", false);
 		overrideWorldEditCommands = cfg.getBoolean("overrideWorldEditCommands");
 		if (disableDrops) {
 			if (getPluginManager().isPluginEnabled("LogBlock"))
 				consumer = ((LogBlock)getPluginManager().getPlugin("LogBlock")).getConsumer();
 			else {
-				getLogger().severe("[Superpickaxe] LogBlock not found");
+				getLogger().severe(" LogBlock not found! (REQUIRED)");
 				consumer = null;
 			}
 		} else
 			consumer = null;
 		pm.registerEvents(this, this);
 		if (overrideWorldEditCommands) {
-			getLogger().info("[Superpickaxe] Overriding WorldEdit commands");
+			getLogger().info("SPA Now Overriding WorldEdit commands");
 			for (final String cmd : new String[]{"/", "superpickaxe"})
 				if (getPluginCommand(cmd) != null)
 					getPluginCommand(cmd).setExecutor(this);
 		}
-		getLogger().info("Superpickaxe v" + getDescription().getVersion() + " by DiddiZ enabled");
+		getLogger().info("SuperPickaxe (Version: " + getDescription().getVersion() + ") enabled!");
 	}
 
 	@Override
 	public void onDisable() {
-		getLogger().info("Superpickaxe disabled");
+		getLogger().info("SuperPickaxe disabled");
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if (sender instanceof Player) {
 			final Player player = (Player)sender;
-			if (hasPermission(player, "superpickaxe.use")) {
+			if (PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.use")) {
 				if (hasEnabled(player))
 					removePlayer(player);
 				else
 					addPlayer(player);
 			} else
-				player.sendMessage(ChatColor.RED + "You aren't allowed to do this.");
+				player.sendMessage(ChatColor.DARK_RED + "You do not have permission to use that!");
 		} else
-			sender.sendMessage("You aren't a player");
+			sender.sendMessage(ChatColor.DARK_RED + "This command cannot be used unless you are a player!");
 		return true;
 	}
 
@@ -102,15 +100,16 @@ public class Superpickaxe extends JavaPlugin implements Listener
 	public void onBlockDamage(BlockDamageEvent event) {
 		final Player player = event.getPlayer();
 		final ItemStack tool = event.getItemInHand();
-		if (!event.isCancelled() && hasEnabled(player) && tool != null && tools.contains(tool.getTypeId()) && !(dontBreak.contains(event.getBlock().getTypeId()) && !hasPermission(player, "superpickaxe.breakAll")))
+		if (!event.isCancelled() && hasEnabled(player) && tool != null && tools.contains(tool.getTypeId()) && !(dontBreak.contains(event.getBlock().getTypeId()) && !PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.breakAll")))
 			if (disableDrops && consumer != null) {
 				consumer.queueBlockBreak(player.getName(), event.getBlock().getState());
 				event.getBlock().setTypeId(0);
 				event.setCancelled(true);
 			} else {
 				event.setInstaBreak(true);
-				if (disableToolWear)
+				if (tool.getEnchantments().isEmpty() && PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.notooldamage")) {
 					tool.setDurability((short)(tool.getDurability() - 1));
+				}
 			}
 	}
 
@@ -129,27 +128,22 @@ public class Superpickaxe extends JavaPlugin implements Listener
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
-		if (hasEnabled(player) && !hasPermission(player, "superpickaxe.use"))
+		if (hasEnabled(player) && !PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.use"))
 			removePlayer(player);
 	}
 
 	void addPlayer(Player player) {
 		playerswithsp.add(player.getName());
-		player.sendMessage(ChatColor.GREEN + "StompzHammer enabled.");
+		player.sendMessage(ChatColor.AQUA + "SuperPickaxe now enabled!");
 	}
 
 	void removePlayer(Player player) {
 		playerswithsp.remove(player.getName());
-		player.sendMessage(ChatColor.GREEN + "StompzHammer disabled.");
+		player.sendMessage(ChatColor.AQUA + "SuperPickaxe now disabled!");
 	}
 
 	boolean hasEnabled(Player player) {
 		return playerswithsp.contains(player.getName());
 	}
 
-	boolean hasPermission(CommandSender sender, String permission) {
-		if (permissions != null && sender instanceof Player)
-			return permissions.has((Player)sender, permission);
-		return sender.hasPermission(permission);
-	}
 }
