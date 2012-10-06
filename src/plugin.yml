@@ -1,24 +1,23 @@
 name: Superpickaxe
-version: 0.4f
-author: DiddiZ
-website: http://diddiz.insane-architects.net/
+version: 1.1
+authors: 
+ - DiddiZ 
+ - Asacavanagh
 main: de.diddiz.superpickaxe.Superpickaxe
 description: Adds a simple super pickaxe.
-softdepend: [LogBlock, WorldEdit, Permissions]
+softdepend: [LogBlock, WorldEdit]
 commands:
   spa:
     description: 'Enables or disables super pickaxe'
     usage: 'Usage: /<command>'
     aliases: []
 permissions:
-    superpickaxe.*:
-        description: Gives access to all SuperPickaxe commands
-        children:
-            superpickaxe.use: true
-            superpickaxe.breakAll: true
     superpickaxe.use:
         description: 'Allows to use the super pickaxe'
         default: op
     superpickaxe.breakAll:
-        description: 'Allows to ignore dontBreak listed blocks'
+        description: 'Allows the user to break any blocks'
+        default: op
+    superpickaxe.notooldamage:
+        description: 'Disables tool damage when using spa tools'
         default: op
