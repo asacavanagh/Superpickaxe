@@ -6,7 +6,7 @@ Super Pickaxe commands. Supports all major permissions plugins including Bukkit'
 Current Default Commands:
 Enable/Disable - /spa
 
-Current Default Permissions:
+Current Permissions (Self Explanitory):
 - superpickaxe.use
 - superpickaxe.notooldamage
 - superpickaxe.breakAll
@@ -22,6 +22,6 @@ Please note the following:
 - Specific enchantments such as fortune may be individually detected in future version instead of the entire range of enchantments.
 - Future versions will have the ability to reload the configuration file without needing to use the /reload command.
 
-This plugin was orginally developed by "DiddiZ" and has been unoffically updated/continued by "asacavangh".
+This plugin was orginally developed by "DiddiZ" and has been unoffically updated/continued by "asacavanagh".
 Please be supportive of the original dev and pay visit to their site and check out their work  at
 http://www.diddiz.de/ or have a look at their other plugins on bukkit http://dev.bukkit.org/profiles/DiddiZ/
