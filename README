@@ -1,1 +1,27 @@
-This plugin implements a simple super pickaxe that destroys everything with a single hit. It has fever features like WordEdit's super pickaxe, but is loggable with LogBLock and BigBrother. The default command to enable/diable the superpickaxe is "/spa" (Super PickAxe) but there is an option to override the WorldEdit commands "//" and "/,". Supports permissions, the only node is "superpickaxe.use".
+This plugin implements a simple but effective "Super Pickaxe" that destroys all blocks in a single click.
+The plugin has similar features to WorldEdit's "//" Super Pick, however this one 
+is loggable using LogBlock or bigBrother. It also has an option within its config to override WorldEdits
+Super Pickaxe commands. Supports all major permissions plugins including Bukkit's permissions!
+
+Current Default Commands:
+Enable/Disable - /spa
+
+Current Default Permissions:
+- superpickaxe.use
+- superpickaxe.notooldamage
+- superpickaxe.breakAll
+
+REQUIREMENTS:
+- Bukkit (Latest RB) - http://dl.bukkit.org/downloads/craftbukkit/list/rb/
+- WorldEdit - http://dev.bukkit.org/server-mods/worldedit/
+- LogBlock - http://dev.bukkit.org/server-mods/logblock/
+
+Please note the following:
+
+- The plugin has been made so that all enchanted tools will remain taking damage even if the player has the no tool damage permission node! 
+- Specific enchantments such as fortune may be individually detected in future version instead of the entire range of enchantments.
+- Future versions will have the ability to reload the configuration file without needing to use the /reload command.
+
+This plugin was orginally developed by "DiddiZ" and has been unoffically updated/continued by "asacavangh".
+Please be supportive of the original dev and pay visit to their site and check out their work  at
+http://www.diddiz.de/ or have a look at their other plugins on bukkit http://dev.bukkit.org/profiles/DiddiZ/
