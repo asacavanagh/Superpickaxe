@@ -27,7 +27,7 @@ import de.diddiz.LogBlock.Consumer;
 import de.diddiz.LogBlock.LogBlock;
 import com.sk89q.wepif.PermissionsResolverManager; 
 
-// Dropped "Permissions" only support; now imports "WEPIF" to support
+// Dropped "Permissions" support, now imports "WEPIF" to support
 // many major permissions plugins and even BukkitPermissions
 
 public class Superpickaxe extends JavaPlugin implements Listener
@@ -84,11 +84,13 @@ public class Superpickaxe extends JavaPlugin implements Listener
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if (sender instanceof Player) {
 			final Player player = (Player)sender;
-			if (PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.use")) {
-				if (hasEnabled(player))
+			if (PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.use")) 
+			{
+				if (hasEnabled(player)) {
 					removePlayer(player);
-				else
+				} else {
 					addPlayer(player);
+				}
 			} else
 				player.sendMessage(ChatColor.DARK_RED + "You do not have permission to use that!");
 		} else
@@ -101,20 +103,27 @@ public class Superpickaxe extends JavaPlugin implements Listener
 		final Player player = event.getPlayer();
 		final ItemStack tool = event.getItemInHand();
 		if (!event.isCancelled() && hasEnabled(player) && tool != null && tools.contains(tool.getTypeId()) && !(dontBreak.contains(event.getBlock().getTypeId()) && !PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.breakAll")))
-			if (disableDrops && consumer != null) {
+		{
+			if (disableDrops && consumer != null) 
+			{
 				consumer.queueBlockBreak(player.getName(), event.getBlock().getState());
 				event.getBlock().setTypeId(0);
 				event.setCancelled(true);
-			} else {
+			} 
+			else 
+			{
 				event.setInstaBreak(true);
-				if (tool.getEnchantments().isEmpty() && PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.notooldamage")) {
+				if (tool.getEnchantments().isEmpty() && PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.notooldamage")) 
+				{
 					tool.setDurability((short)(tool.getDurability() - 1));
 				}
 			}
+		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+		/*final Player player = event.getPlayer();*/
 		if (!event.isCancelled() && overrideWorldEditCommands) {
 			final String msg = event.getMessage().toLowerCase();
 			if (msg.equals("/") || msg.equals("//") || msg.equals("/,") || msg.equals("/sp")) {
@@ -123,13 +132,23 @@ public class Superpickaxe extends JavaPlugin implements Listener
 				getServer().dispatchCommand(event.getPlayer(), "spa");
 			}
 		}
+		/* if (PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.reload")) {
+			final String msg = event.getMessage().toLowerCase();
+			if (msg.equals("/spareload")) {
+				this.reloadConfig();
+				player.sendMessage(ChatColor.DARK_GREEN + "SPA Configuration Reloaded!");
+			}				
+		} else
+			player.sendMessage(ChatColor.DARK_GREEN + "You do not have permission to use that!");*/
 	}
-
+	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
 		if (hasEnabled(player) && !PermissionsResolverManager.getInstance().hasPermission(player, "superpickaxe.use"))
+		{
 			removePlayer(player);
+		}
 	}
 
 	void addPlayer(Player player) {
