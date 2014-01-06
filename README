@@ -1,4 +1,4 @@
-Works fine with 1.6.2 as far as I can see!
+This version of SPA is compatible with Spigot/Craftbukkit for 1.7.2 thus far.
 
 This plugin implements a simple but effective "Super Pickaxe" that destroys all blocks in a single click.
 The plugin has similar features to WorldEdit's "//" Super Pick, however this one 
